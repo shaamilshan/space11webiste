@@ -33,9 +33,8 @@ export default function App() {
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 
-  const handleEnquireWhatsApp = () => {
-    const text = encodeURIComponent(`Hello SPACE11! I would like to inquire about your workspace services.`);
-    window.open(`https://wa.me/919207700711?text=${text}`, '_blank');
+  const handleDirectCall = () => {
+    window.location.href = 'tel:+919207700711';
   };
 
   const handleBookNowWhatsApp = (itemName = "Desk / Space") => {
@@ -89,12 +88,12 @@ export default function App() {
       </AnimatePresence>
 
       <div className="min-h-screen bg-white font-sans antialiased text-[#194239]">
-        <Navbar onOpenEnquire={handleEnquireWhatsApp} onOpenBlog={navigateToBlog} />
+        <Navbar onOpenEnquire={handleDirectCall} onOpenBlog={navigateToBlog} />
         <main>
-          <Hero onOpenEnquire={handleEnquireWhatsApp} onBookVisit={() => handleBookNowWhatsApp("Site Visit Tour")} />
+          <Hero onOpenEnquire={handleDirectCall} onBookVisit={handleOpenModal} />
           <WhyChooseUs />
           <BusinessFacilities onOpenBooking={(facilityName) => handleBookNowWhatsApp(facilityName)} />
-          <DiscoverSpace onOpenBooking={() => handleBookNowWhatsApp("Workspace Consultation")} />
+          <DiscoverSpace onOpenBooking={handleOpenModal} />
           <GallerySection />
           <AmenitiesOffer />
           <TestimonialSection />
@@ -104,7 +103,7 @@ export default function App() {
         </main>
         <Footer onOpenBlog={navigateToBlog} />
         <WhatsAppButton />
-        <ReserveModal isOpen={isModalOpen} onClose={handleCloseModal} onBookWhatsApp={handleBookNowWhatsApp} />
+        <ReserveModal isOpen={isModalOpen} onClose={handleCloseModal} />
       </div>
     </>
   );

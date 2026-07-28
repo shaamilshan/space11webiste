@@ -19,7 +19,7 @@ export default function Navbar({ onOpenEnquire, onOpenBlog }) {
         
         {/* Brand Logo - SPACE11 VENTURES */}
         <a href="#home" onClick={closeMenu} className="flex items-center">
-          <img src="/logo-white.png" alt="SPACE11 VENTURES" className="h-7 sm:h-8 object-contain hover:scale-105 transition-transform" />
+          <img src="/logo-white.png" alt="SPACE11 VENTURES" className="h-9 sm:h-11 md:h-12 object-contain hover:scale-105 transition-transform" />
         </a>
 
         {/* Center Desktop Nav Links (Boxy Glassy Container) */}
