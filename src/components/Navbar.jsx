@@ -22,8 +22,8 @@ export default function Navbar({ onOpenEnquire, onOpenBlog }) {
           <img src="/logo-white.png" alt="SPACE11 VENTURES" className="h-7 sm:h-8 object-contain hover:scale-105 transition-transform" />
         </a>
 
-        {/* Center Desktop Nav Links (Glassy Pill Container) */}
-        <nav className="hidden md:flex items-center space-x-8 text-sm font-medium bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-7 py-2.5 shadow-lg">
+        {/* Center Desktop Nav Links (Boxy Glassy Container) */}
+        <nav className="hidden md:flex items-center space-x-8 text-sm font-medium bg-white/10 backdrop-blur-md border border-white/20 rounded-none px-7 py-3 shadow-lg">
           <a href="#home" className="hover:text-white/80 transition-colors">Home</a>
           <a href="#services" className="hover:text-white/80 transition-colors">Services</a>
           <a href="#about" className="hover:text-white/80 transition-colors">About US</a>
