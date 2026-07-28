@@ -12,7 +12,14 @@ export default function ContactSection() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert('Thank you for contacting SPACE11! We will get back to you shortly.');
+    const text = encodeURIComponent(
+      `Hello SPACE11! New Contact Form Message:\n\n` +
+      `Name: ${formData.name}\n` +
+      `Email: ${formData.email}\n` +
+      `Phone: ${formData.phone}\n` +
+      `Message: ${formData.message || 'No additional message'}`
+    );
+    window.open(`https://wa.me/919207700711?text=${text}`, '_blank');
   };
 
   const containerVariants = {
@@ -93,7 +100,7 @@ export default function ContactSection() {
                     <input
                       type="tel"
                       required
-                      placeholder="+91 98765 43210"
+                      placeholder="+91 9207 700 711"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       className="w-full bg-white border border-gray-300 rounded-none px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#248057]"
@@ -128,10 +135,10 @@ export default function ContactSection() {
           <motion.div variants={fadeUp} className="lg:col-span-6 flex flex-col justify-between space-y-6">
             
             {/* Interactive Embedded Google Map */}
-            <div className="w-full h-72 sm:h-80 border border-gray-200 shadow-xs overflow-hidden relative">
+            <div className="w-full h-72 sm:h-80 border border-gray-200 shadow-xs overflow-hidden relative group">
               <iframe
                 title="SPACE11 Location Map"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3887.975412497619!2d77.5945627!3d12.9715987!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae1670c9000001%3A0xf0b96f540ed5b80a!2sBengaluru%2C%20Karnataka!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+                src="https://maps.google.com/maps?cid=3145987843263983639&output=embed"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
@@ -140,27 +147,40 @@ export default function ContactSection() {
                 referrerPolicy="no-referrer-when-downgrade"
                 className="w-full h-full grayscale hover:grayscale-0 transition-all duration-500"
               />
+              <a
+                href="https://www.google.com/maps?cid=3145987843263983639"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute bottom-3 right-3 bg-[#248057] text-white px-3 py-1.5 text-xs font-bold shadow-md hover:bg-[#1a5b3e] transition-all flex items-center gap-1.5 z-10"
+              >
+                Open Pin on Google Maps ↗
+              </a>
             </div>
 
             {/* Quick Info Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
               
-              <div className="p-4 bg-gray-50 border border-gray-200 text-left space-y-1">
-                <MapPin className="w-5 h-5 text-[#248057] mb-2" />
-                <h5 className="font-bold text-gray-900 text-xs uppercase">Location</h5>
-                <p className="text-xs text-gray-600">SPACE11 Campus, Main Road Premises</p>
-              </div>
+              <a
+                href="https://www.google.com/maps?cid=3145987843263983639"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-4 bg-gray-50 border border-gray-200 text-left space-y-1 hover:border-[#248057] hover:bg-white transition-all group"
+              >
+                <MapPin className="w-5 h-5 text-[#248057] mb-2 group-hover:scale-110 transition-transform" />
+                <h5 className="font-bold text-gray-900 text-xs uppercase">Location ↗</h5>
+                <p className="text-xs text-gray-600">Koodathai, Near Edu Park</p>
+              </a>
 
               <div className="p-4 bg-gray-50 border border-gray-200 text-left space-y-1">
                 <Phone className="w-5 h-5 text-[#248057] mb-2" />
                 <h5 className="font-bold text-gray-900 text-xs uppercase">Phone</h5>
-                <p className="text-xs text-gray-600">+91 98765 43210</p>
+                <p className="text-xs text-gray-600">+91 9207 700 711</p>
               </div>
 
               <div className="p-4 bg-gray-50 border border-gray-200 text-left space-y-1">
                 <Mail className="w-5 h-5 text-[#248057] mb-2" />
                 <h5 className="font-bold text-gray-900 text-xs uppercase">Email</h5>
-                <p className="text-xs text-gray-600">hello@space11.com</p>
+                <p className="text-xs text-gray-600">space11ventures@gmail.com</p>
               </div>
 
             </div>

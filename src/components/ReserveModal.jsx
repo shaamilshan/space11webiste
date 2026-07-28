@@ -4,7 +4,7 @@ import { X, ChevronDown } from 'lucide-react';
 export default function ReserveModal({ isOpen, onClose }) {
   const [formData, setFormData] = useState({
     name: '',
-    deskType: 'Flexi Desk',
+    service: 'Dedicated Desk',
     phone: '',
     email: ''
   });
@@ -13,7 +13,14 @@ export default function ReserveModal({ isOpen, onClose }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert('Desk reservation submitted!');
+    const text = encodeURIComponent(
+      `Hello SPACE11! New Service Booking Request:\n\n` +
+      `Service: ${formData.service}\n` +
+      `Name: ${formData.name}\n` +
+      `Phone: ${formData.phone}\n` +
+      `Email: ${formData.email || 'N/A'}`
+    );
+    window.open(`https://wa.me/919207700711?text=${text}`, '_blank');
     onClose();
   };
 
@@ -39,7 +46,7 @@ export default function ReserveModal({ isOpen, onClose }) {
         <div className="relative hidden md:block h-full min-h-[420px]">
           <img
             src="https://images.unsplash.com/photo-1527192491265-7e15c55b1ed2?auto=format&fit=crop&w=800&q=80"
-            alt="Reserve Your Desk"
+            alt="Reserve Your Space"
             className="w-full h-full object-cover opacity-90"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-black/30 pointer-events-none" />
@@ -49,10 +56,10 @@ export default function ReserveModal({ isOpen, onClose }) {
         <div className="p-8 sm:p-10 flex flex-col justify-between text-left space-y-6 bg-black/20 backdrop-blur-md">
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white drop-shadow-sm">
-              Reserve Your Desk
+              Reserve Your Space
             </h2>
             <p className="text-xs text-white/70 mt-1">
-              Please fill in the details below to book your workspace.
+              Select a service below to connect with us instantly on WhatsApp.
             </p>
           </div>
 
@@ -72,21 +79,24 @@ export default function ReserveModal({ isOpen, onClose }) {
               />
             </div>
 
-            {/* CHOOSE DESK TYPE */}
+            {/* CHOOSE SERVICE TYPE */}
             <div>
               <label className="block text-[10px] font-bold tracking-widest text-white/80 uppercase mb-1.5">
-                CHOOSE DESK TYPE
+                SELECT SERVICE
               </label>
               <div className="relative">
                 <select
-                  value={formData.deskType}
-                  onChange={(e) => setFormData({ ...formData, deskType: e.target.value })}
+                  value={formData.service}
+                  onChange={(e) => setFormData({ ...formData, service: e.target.value })}
                   className="w-full bg-white/20 border border-white/25 backdrop-blur-md text-white rounded-lg px-4 py-2.5 text-sm appearance-none focus:outline-none focus:border-white/60 focus:bg-white/30 transition-all cursor-pointer pr-10 [&>option]:bg-gray-900 [&>option]:text-white"
                 >
-                  <option value="Flexi Desk">Flexi Desk</option>
                   <option value="Dedicated Desk">Dedicated Desk</option>
                   <option value="Private Office">Private Office Suite</option>
-                  <option value="Meeting Room">Meeting Room</option>
+                  <option value="Virtual Office">Virtual Office</option>
+                  <option value="Flexi Desk">Flexi Desk</option>
+                  <option value="Conference Room">Conference Room</option>
+                  <option value="Photo & Podcast Studio">Photo & Podcast Studio</option>
+                  <option value="Event & Workshop Space">Event & Workshop Space</option>
                 </select>
                 <ChevronDown className="w-4 h-4 text-white/70 absolute right-3 top-3 pointer-events-none" />
               </div>

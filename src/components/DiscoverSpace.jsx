@@ -57,7 +57,7 @@ export default function DiscoverSpace({ onOpenBooking }) {
           className="p-8 sm:p-14 lg:p-20 flex flex-col justify-center text-left space-y-6 bg-[#111111]"
         >
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight font-sans">
-            Where Productivity Meets Flexibility — Your Ideal Work Hub
+            Where Productivity Meets Flexibility - Your Ideal Work Hub
           </h2>
 
           <p className="text-sm sm:text-base text-white/80 font-normal leading-relaxed max-w-xl">

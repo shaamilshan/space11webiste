@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Laptop, Building2, Globe, Mic, Users2, Armchair } from 'lucide-react';
 
 export default function BusinessFacilities({ onOpenBooking }) {
   // First card selected by default (index 0)
@@ -8,33 +9,33 @@ export default function BusinessFacilities({ onOpenBooking }) {
   const facilities = [
     {
       title: 'Dedicated Desk',
-      description: "You'll have your own moving representative on-call, any time of day or night. No automated systems or unanswered questions.",
-      iconType: 'event'
+      description: "You'll have your own personal dedicated desk in a quiet, productive environment with high-speed wifi & 24/7 access.",
+      icon: Armchair
     },
     {
       title: 'Private Office',
-      description: "You'll have your own moving representative on-call, any time of day or night. No automated systems or unanswered questions.",
-      iconType: 'house'
+      description: "Lockable, fully-furnished private office suites designed for teams seeking privacy, security, and brand identity.",
+      icon: Building2
     },
     {
       title: 'Virtual Office',
-      description: "You'll have your own moving representative on-call, any time of day or night. No automated systems or unanswered questions.",
-      iconType: 'building'
+      description: "Professional business address, mail handling, and official registration services without physical desk commitment.",
+      icon: Globe
     },
     {
       title: 'Flexi Desk',
-      description: "You'll have your own moving representative on-call, any time of day or night. No automated systems or unanswered questions.",
-      iconType: 'building'
+      description: "Flexible hot-desk options giving you the freedom to choose any open workspace daily in our creative hub.",
+      icon: Laptop
     },
     {
       title: 'Conference Room',
-      description: "You'll have your own moving representative on-call, any time of day or night. No automated systems or unanswered questions.",
-      iconType: 'building'
+      description: "High-tech meeting rooms equipped with wireless screen sharing, 4K displays, and acoustic soundproofing.",
+      icon: Users2
     },
     {
-      title: 'Dedicated Desk',
-      description: "You'll have your own moving representative on-call, any time of day or night. No automated systems or unanswered questions.",
-      iconType: 'event'
+      title: 'Photo & Podcast Studio',
+      description: "Fully equipped soundproof acoustic studio with broadcast lighting, XLR mics, and multi-camera support for creators.",
+      icon: Mic
     }
   ];
 
@@ -91,7 +92,7 @@ export default function BusinessFacilities({ onOpenBooking }) {
             BUSINESS FACILITIES
           </h2>
           <p className="text-sm text-white/90 max-w-xl font-normal leading-relaxed">
-            Advancing Cleaning & Outsourced Staff Service through Skilled Management. Cleaning Driving And Security Service
+            Premium co-working infrastructure, private suites, soundproof studios, and flexible rentals tailored for modern enterprises and creators.
           </p>
         </motion.div>
 
@@ -102,6 +103,7 @@ export default function BusinessFacilities({ onOpenBooking }) {
         >
           {facilities.map((item, index) => {
             const isSelected = selectedIndex === index;
+            const Icon = item.icon;
 
             return (
               <motion.div
@@ -123,36 +125,11 @@ export default function BusinessFacilities({ onOpenBooking }) {
                 />
 
                 <div className="space-y-6 relative z-10">
-                  {/* SVG Icon matching reference design */}
-                  <div className="w-16 h-16">
-                    {item.iconType === 'event' && (
-                      <svg viewBox="0 0 64 64" fill="none" className={`w-full h-full transition-colors duration-300 ${isSelected ? 'stroke-white' : 'stroke-[#248057]'}`} strokeWidth="2.5">
-                        <rect x="8" y="16" width="48" height="32" rx="4" />
-                        <line x1="20" y1="8" x2="16" y2="16" />
-                        <line x1="44" y1="8" x2="48" y2="16" />
-                        <text x="32" y="36" textAnchor="middle" fill="currentColor" stroke="none" className="text-[10px] font-black tracking-widest uppercase">EVENT</text>
-                      </svg>
-                    )}
-
-                    {item.iconType === 'house' && (
-                      <svg viewBox="0 0 64 64" fill="none" className={`w-full h-full transition-colors duration-300 ${isSelected ? 'stroke-white' : 'stroke-[#248057]'}`} strokeWidth="2.5">
-                        <path d="M12 28L32 12L52 28V52H12V28Z" />
-                        <rect x="24" y="32" width="8" height="8" />
-                        <line x1="44" y1="16" x2="44" y2="22" />
-                      </svg>
-                    )}
-
-                    {item.iconType === 'building' && (
-                      <svg viewBox="0 0 64 64" fill="none" className={`w-full h-full transition-colors duration-300 ${isSelected ? 'stroke-white' : 'stroke-[#248057]'}`} strokeWidth="2.5">
-                        <rect x="18" y="16" width="16" height="36" />
-                        <rect x="34" y="24" width="14" height="28" />
-                        <line x1="22" y1="22" x2="26" y2="22" />
-                        <line x1="22" y1="30" x2="26" y2="30" />
-                        <line x1="22" y1="38" x2="26" y2="38" />
-                        <line x1="38" y1="30" x2="42" y2="30" />
-                        <line x1="38" y1="38" x2="42" y2="38" />
-                      </svg>
-                    )}
+                  {/* Icon */}
+                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-colors duration-300 ${
+                    isSelected ? 'bg-white/15 text-white' : 'bg-[#248057]/10 text-[#248057]'
+                  }`}>
+                    <Icon className="w-7 h-7 stroke-[1.8]" />
                   </div>
 
                   {/* Title & Description */}
@@ -171,7 +148,7 @@ export default function BusinessFacilities({ onOpenBooking }) {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      onOpenBooking();
+                      onOpenBooking(item.title);
                     }}
                     className={`px-8 py-2.5 rounded-lg text-sm font-semibold transition-all ${
                       isSelected

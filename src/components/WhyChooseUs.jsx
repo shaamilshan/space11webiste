@@ -96,7 +96,7 @@ export default function WhyChooseUs() {
               A Space Built For Work, Creativity, And Everything In Between
             </h3>
             <p>
-              At SPACE 11, we believe great ideas deserve an inspiring environment. We've created more than just a workspace—we've built a creative destination where businesses, entrepreneurs, creators, and teams can work, collaborate, and produce exceptional results.
+              At SPACE 11, we believe great ideas deserve an inspiring environment. We've created more than just a workspace - we've built a creative destination where businesses, entrepreneurs, creators, and teams can work, collaborate, and produce exceptional results.
             </p>
             <p className="text-xs sm:text-sm text-gray-600">
               We focus on giving you a clean, eco-friendly environment that feels calm, modern, and easy to work in - without the high costs of traditional offices.
