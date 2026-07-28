@@ -14,7 +14,7 @@ export default function Navbar({ onOpenEnquire, onOpenBlog }) {
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="bg-transparent md:bg-white/10 md:backdrop-blur-md border border-transparent md:border-white/20 rounded-none px-5 sm:px-6 py-3.5 flex items-center justify-between text-white md:shadow-xl relative"
+        className="bg-transparent px-5 sm:px-6 py-3.5 flex items-center justify-between text-white relative"
       >
         
         {/* Brand Logo - SPACE11 VENTURES */}
@@ -22,8 +22,8 @@ export default function Navbar({ onOpenEnquire, onOpenBlog }) {
           <img src="/logo-white.png" alt="SPACE11 VENTURES" className="h-7 sm:h-8 object-contain hover:scale-105 transition-transform" />
         </a>
 
-        {/* Center Desktop Nav Links */}
-        <nav className="hidden md:flex items-center space-x-8 text-sm font-medium">
+        {/* Center Desktop Nav Links (Glassy Pill Container) */}
+        <nav className="hidden md:flex items-center space-x-8 text-sm font-medium bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-7 py-2.5 shadow-lg">
           <a href="#home" className="hover:text-white/80 transition-colors">Home</a>
           <a href="#services" className="hover:text-white/80 transition-colors">Services</a>
           <a href="#about" className="hover:text-white/80 transition-colors">About US</a>
