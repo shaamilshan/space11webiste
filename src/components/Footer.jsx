@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Footer() {
+export default function Footer({ onOpenAdmin }) {
   return (
     <footer className="bg-[#111111] text-white/70 border-t border-white/10 py-12 sm:py-16 px-6 lg:px-16 text-left font-sans pb-24 sm:pb-16">
       <div className="max-w-7xl mx-auto space-y-10 sm:space-y-12">
@@ -70,6 +70,18 @@ export default function Footer() {
           <div className="flex items-center space-x-6">
             <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+            <a
+              href="/admin"
+              onClick={(e) => {
+                if (onOpenAdmin) {
+                  e.preventDefault();
+                  onOpenAdmin();
+                }
+              }}
+              className="hover:text-[#248057] transition-colors"
+            >
+              Admin
+            </a>
           </div>
         </div>
 

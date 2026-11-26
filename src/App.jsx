@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import Preloader from './components/Preloader';
 import Navbar from './components/Navbar';
@@ -14,16 +14,78 @@ import ContactSection from './components/ContactSection';
 import BlogSection from './components/BlogSection';
 import BlogPage from './pages/BlogPage';
 import ArticlePage from './pages/ArticlePage';
+import AdminPage from './pages/AdminPage';
 import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
 import ReserveModal from './components/ReserveModal';
+import { fetchSiteContent } from './services/contentApi';
+import {
+  DEFAULT_GALLERY_CATEGORIES,
+  DEFAULT_GALLERY_ITEMS,
+  DEFAULT_TESTIMONIALS
+} from './data/defaultContent';
+
+function isAdminLocation() {
+  if (typeof window === 'undefined') return false;
+  const normalizedPath = window.location.pathname.replace(/\/+$/, '');
+  return normalizedPath === '/admin' || window.location.hash === '#admin';
+}
 
 export default function App() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState('home');
+  const initialAdmin = isAdminLocation();
+  const [isLoading, setIsLoading] = useState(!initialAdmin);
+  const [currentPage, setCurrentPage] = useState(initialAdmin ? 'admin' : 'home');
   const [selectedArticleId, setSelectedArticleId] = useState(null);
   // Modal opens after preloader finishes
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [siteContent, setSiteContent] = useState({
+    gallery: DEFAULT_GALLERY_ITEMS,
+    galleryCategories: DEFAULT_GALLERY_CATEGORIES,
+    testimonials: DEFAULT_TESTIMONIALS
+  });
+
+  useEffect(() => {
+    let active = true;
+    fetchSiteContent()
+      .then((data) => {
+        if (!active) return;
+        setSiteContent({
+          gallery: Array.isArray(data.gallery) ? data.gallery : DEFAULT_GALLERY_ITEMS,
+          galleryCategories: Array.isArray(data.galleryCategories)
+            ? data.galleryCategories
+            : DEFAULT_GALLERY_CATEGORIES,
+          testimonials: Array.isArray(data.testimonials)
+            ? data.testimonials
+            : DEFAULT_TESTIMONIALS
+        });
+      })
+      .catch(() => {
+        // Fallback to bundled defaults when backend API is unavailable
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const syncRoute = () => {
+      if (isAdminLocation()) {
+        setIsLoading(false);
+        setIsModalOpen(false);
+        setCurrentPage('admin');
+      } else {
+        setCurrentPage((prev) => (prev === 'admin' ? 'home' : prev));
+      }
+    };
+
+    window.addEventListener('popstate', syncRoute);
+    window.addEventListener('hashchange', syncRoute);
+    return () => {
+      window.removeEventListener('popstate', syncRoute);
+      window.removeEventListener('hashchange', syncRoute);
+    };
+  }, []);
 
   const handlePreloaderComplete = () => {
     setIsLoading(false);
@@ -37,8 +99,10 @@ export default function App() {
     window.location.href = 'tel:+919207700711';
   };
 
-  const handleBookNowWhatsApp = (itemName = "Desk / Space") => {
-    const text = encodeURIComponent(`Hello SPACE11! I want to book a reservation for: ${itemName}. Please share availability and pricing.`);
+  const handleBookNowWhatsApp = (itemName = 'Desk / Space') => {
+    const text = encodeURIComponent(
+      `Hello SPACE11! I want to book a reservation for: ${itemName}. Please share availability and pricing.`
+    );
     window.open(`https://wa.me/919207700711?text=${text}`, '_blank');
   };
 
@@ -48,7 +112,21 @@ export default function App() {
   };
 
   const navigateToHome = () => {
+    if (isAdminLocation()) {
+      window.history.pushState({}, '', '/');
+    }
     setCurrentPage('home');
+    setIsLoading(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const navigateToAdmin = () => {
+    if (!isAdminLocation()) {
+      window.history.pushState({}, '', '/admin');
+    }
+    setIsLoading(false);
+    setIsModalOpen(false);
+    setCurrentPage('admin');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -57,6 +135,16 @@ export default function App() {
     setCurrentPage('article');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  if (currentPage === 'admin') {
+    return (
+      <AdminPage
+        siteContent={siteContent}
+        onContentChange={setSiteContent}
+        onNavigateHome={navigateToHome}
+      />
+    );
+  }
 
   if (currentPage === 'article') {
     return (
@@ -94,19 +182,20 @@ export default function App() {
           <WhyChooseUs />
           <BusinessFacilities onOpenBooking={(facilityName) => handleBookNowWhatsApp(facilityName)} />
           <DiscoverSpace onOpenBooking={handleOpenModal} />
-          <GallerySection />
+          <GallerySection
+            items={siteContent.gallery}
+            categories={siteContent.galleryCategories}
+          />
           <AmenitiesOffer />
-          <TestimonialSection />
+          <TestimonialSection items={siteContent.testimonials} />
           <BlogSection onOpenAllBlogs={navigateToBlog} onSelectArticle={navigateToArticle} />
           <FAQSection />
           <ContactSection />
         </main>
-        <Footer onOpenBlog={navigateToBlog} />
+        <Footer onOpenAdmin={navigateToAdmin} />
         <WhatsAppButton />
         <ReserveModal isOpen={isModalOpen} onClose={handleCloseModal} />
       </div>
     </>
   );
 }
-
-

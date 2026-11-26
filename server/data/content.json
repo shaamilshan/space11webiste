@@ -1,0 +1,81 @@
+{
+  "galleryCategories": [
+    "Coworking",
+    "Studios",
+    "Offices",
+    "Events"
+  ],
+  "gallery": [
+    {
+      "id": "gal-1",
+      "src": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
+      "title": "Open Coworking Lounge",
+      "category": "Coworking",
+      "createdAt": "2026-07-01T00:00:00.000Z"
+    },
+    {
+      "id": "gal-2",
+      "src": "https://images.unsplash.com/photo-1527192491265-7e15c55b1ed2?auto=format&fit=crop&w=800&q=80",
+      "title": "Private Executive Suite",
+      "category": "Offices",
+      "createdAt": "2026-07-02T00:00:00.000Z"
+    },
+    {
+      "id": "gal-3",
+      "src": "https://images.unsplash.com/photo-1577412647305-991150c7d163?auto=format&fit=crop&w=800&q=80",
+      "title": "Photography & Podcast Studio",
+      "category": "Studios",
+      "createdAt": "2026-07-03T00:00:00.000Z"
+    },
+    {
+      "id": "gal-4",
+      "src": "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80",
+      "title": "Dedicated Work Desks",
+      "category": "Coworking",
+      "createdAt": "2026-07-04T00:00:00.000Z"
+    },
+    {
+      "id": "gal-5",
+      "src": "https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=800&q=80",
+      "title": "Conference & Event Space",
+      "category": "Events",
+      "createdAt": "2026-07-05T00:00:00.000Z"
+    },
+    {
+      "id": "gal-6",
+      "src": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80",
+      "title": "Green Outdoor Lounge",
+      "category": "Studios",
+      "createdAt": "2026-07-06T00:00:00.000Z"
+    }
+  ],
+  "testimonials": [
+    {
+      "id": "test-1",
+      "quote": "SPACE11 completely transformed how our agency operates. The photography studio and private office setup under one roof saved us countless hours.",
+      "author": "Alex Morgan",
+      "role": "Creative Director, Studio Nexus",
+      "rating": 5,
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
+      "createdAt": "2026-07-01T00:00:00.000Z"
+    },
+    {
+      "id": "test-2",
+      "quote": "The green surroundings and peaceful workspace vibe helped our tech startup focus and grow. Plus, the community networking is top-tier.",
+      "author": "Priya Sharma",
+      "role": "Founder & CEO, GreenScale",
+      "rating": 5,
+      "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80",
+      "createdAt": "2026-07-02T00:00:00.000Z"
+    },
+    {
+      "id": "test-3",
+      "quote": "Super flexible rental options and incredibly helpful staff. Having power backup and high-speed Wi-Fi 24/7 gives us total peace of mind.",
+      "author": "David Chen",
+      "role": "Senior Consultant, Apex Ventures",
+      "rating": 5,
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
+      "createdAt": "2026-07-03T00:00:00.000Z"
+    }
+  ]
+}
