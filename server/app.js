@@ -328,6 +328,10 @@ export function createApiApp({ serveStaticDist = false } = {}) {
     }
   });
 
+  app.use('/api', (_req, res) => {
+    res.status(404).json({ error: 'API route not found.' });
+  });
+
   if (serveStaticDist && fs.existsSync(DIST_DIR)) {
     app.use(express.static(DIST_DIR));
     app.get(/^(?!\/api|\/uploads).*/, (_req, res) => {
