@@ -5,11 +5,17 @@ import { fileURLToPath } from 'node:url';
 import express from 'express';
 import multer from 'multer';
 import {
+  StorageConfigError,
   UPLOADS_DIR,
-  cleanupUnusedUpload,
-  ensureStorage,
+  createGalleryItem,
+  createTestimonial,
+  deleteGalleryItem,
+  deleteTestimonial,
+  getStorageMode,
   readContent,
-  updateContent
+  saveUploadedImage,
+  updateGalleryItem,
+  updateTestimonial
 } from './storage.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -112,22 +118,9 @@ function clampRating(value) {
   return Math.min(5, Math.max(1, Math.round(num)));
 }
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    ensureStorage()
-      .then(() => cb(null, UPLOADS_DIR))
-      .catch(cb);
-  },
-  filename: (_req, file, cb) => {
-    const ext = ALLOWED_MIME_EXTENSIONS[file.mimetype] || '.jpg';
-    const uniqueName = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}${ext}`;
-    cb(null, uniqueName);
-  }
-});
-
 const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 4 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     if (!ALLOWED_MIME_EXTENSIONS[file.mimetype]) {
       cb(new Error('Only JPG, PNG, WEBP, GIF, and AVIF images are allowed.'));
@@ -142,15 +135,26 @@ const upload = multer({
  */
 export function createApiApp({ serveStaticDist = false } = {}) {
   const app = express();
+  app.use((req, _res, next) => {
+    if (req.body !== undefined && !req._body) {
+      req._body = true;
+    }
+    next();
+  });
   app.use(express.json({ limit: '1mb' }));
-  app.use('/uploads', express.static(UPLOADS_DIR));
+
+  if (getStorageMode() === 'local') {
+    app.use('/uploads', express.static(UPLOADS_DIR));
+  }
 
   app.get('/api/health', (_req, res) => {
-    res.json({ ok: true });
+    res.setHeader('Cache-Control', 'no-store');
+    res.json({ ok: true, storage: getStorageMode() });
   });
 
   app.get('/api/content', async (_req, res, next) => {
     try {
+      res.setHeader('Cache-Control', 'no-store');
       const content = await readContent();
       res.json(content);
     } catch (err) {
@@ -159,6 +163,13 @@ export function createApiApp({ serveStaticDist = false } = {}) {
   });
 
   app.post('/api/admin/login', (req, res) => {
+    if (getStorageMode() === 'unconfigured') {
+      return res.status(503).json({
+        error:
+          'Supabase is not configured. Add SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel Environment Variables and run supabase/schema.sql.'
+      });
+    }
+
     const password = req.body?.password;
     if (!isValidPassword(password)) {
       return res.status(401).json({ error: 'Invalid admin password.' });
@@ -179,15 +190,26 @@ export function createApiApp({ serveStaticDist = false } = {}) {
     res.json({ authenticated: true, expiresAt: req.adminSession.exp });
   });
 
-  app.post('/api/upload', requireAdmin, (req, res) => {
-    upload.single('image')(req, res, (err) => {
+  app.post('/api/upload', requireAdmin, (req, res, next) => {
+    upload.single('image')(req, res, async (err) => {
       if (err) {
         return res.status(400).json({ error: err.message || 'Image upload failed.' });
       }
       if (!req.file) {
         return res.status(400).json({ error: 'No image file provided.' });
       }
-      res.status(201).json({ url: `/uploads/${req.file.filename}` });
+
+      try {
+        const extension = ALLOWED_MIME_EXTENSIONS[req.file.mimetype] || '.jpg';
+        const result = await saveUploadedImage({
+          buffer: req.file.buffer,
+          extension,
+          mimetype: req.file.mimetype
+        });
+        res.status(201).json(result);
+      } catch (uploadErr) {
+        next(uploadErr);
+      }
     });
   });
 
@@ -202,23 +224,8 @@ export function createApiApp({ serveStaticDist = false } = {}) {
         return res.status(400).json({ error: 'Title, category, and image are required.' });
       }
 
-      const item = {
-        id: `gal-${crypto.randomUUID().slice(0, 8)}`,
-        title,
-        category,
-        src,
-        createdAt: new Date().toISOString()
-      };
-
-      const next = await updateContent((content) => {
-        content.gallery.unshift(item);
-        if (!content.galleryCategories.includes(category)) {
-          content.galleryCategories.push(category);
-        }
-        return content;
-      });
-
-      res.status(201).json({ item, gallery: next.gallery, galleryCategories: next.galleryCategories });
+      const result = await createGalleryItem({ title, category, src });
+      res.status(201).json(result);
     } catch (err) {
       next(err);
     }
@@ -235,38 +242,12 @@ export function createApiApp({ serveStaticDist = false } = {}) {
         return res.status(400).json({ error: 'Title, category, and image are required.' });
       }
 
-      let previousSrc = null;
-      let updatedItem = null;
-
-      const next = await updateContent((content) => {
-        const idx = content.gallery.findIndex((g) => g.id === id);
-        if (idx === -1) return content;
-
-        previousSrc = content.gallery[idx].src;
-        updatedItem = {
-          ...content.gallery[idx],
-          title,
-          category,
-          src,
-          updatedAt: new Date().toISOString()
-        };
-        content.gallery[idx] = updatedItem;
-
-        if (!content.galleryCategories.includes(category)) {
-          content.galleryCategories.push(category);
-        }
-        return content;
-      });
-
-      if (!updatedItem) {
+      const result = await updateGalleryItem(id, { title, category, src });
+      if (!result) {
         return res.status(404).json({ error: 'Gallery item not found.' });
       }
 
-      if (previousSrc && previousSrc !== src) {
-        await cleanupUnusedUpload(previousSrc, next);
-      }
-
-      res.json({ item: updatedItem, gallery: next.gallery, galleryCategories: next.galleryCategories });
+      res.json(result);
     } catch (err) {
       next(err);
     }
@@ -274,23 +255,12 @@ export function createApiApp({ serveStaticDist = false } = {}) {
 
   app.delete('/api/gallery/:id', requireAdmin, async (req, res, next) => {
     try {
-      const { id } = req.params;
-      let removedItem = null;
-
-      const next = await updateContent((content) => {
-        const idx = content.gallery.findIndex((g) => g.id === id);
-        if (idx !== -1) {
-          [removedItem] = content.gallery.splice(idx, 1);
-        }
-        return content;
-      });
-
-      if (!removedItem) {
+      const result = await deleteGalleryItem(req.params.id);
+      if (!result) {
         return res.status(404).json({ error: 'Gallery item not found.' });
       }
 
-      await cleanupUnusedUpload(removedItem.src, next);
-      res.json({ gallery: next.gallery, galleryCategories: next.galleryCategories });
+      res.json(result);
     } catch (err) {
       next(err);
     }
@@ -309,22 +279,8 @@ export function createApiApp({ serveStaticDist = false } = {}) {
         return res.status(400).json({ error: 'Author, role, and testimonial quote are required.' });
       }
 
-      const item = {
-        id: `test-${crypto.randomUUID().slice(0, 8)}`,
-        author,
-        role,
-        quote,
-        rating,
-        avatar,
-        createdAt: new Date().toISOString()
-      };
-
-      const next = await updateContent((content) => {
-        content.testimonials.unshift(item);
-        return content;
-      });
-
-      res.status(201).json({ item, testimonials: next.testimonials });
+      const result = await createTestimonial({ author, role, quote, rating, avatar });
+      res.status(201).json(result);
     } catch (err) {
       next(err);
     }
@@ -332,7 +288,6 @@ export function createApiApp({ serveStaticDist = false } = {}) {
 
   app.put('/api/testimonials/:id', requireAdmin, async (req, res, next) => {
     try {
-      const { id } = req.params;
       const author = normalizeString(req.body?.author);
       const role = normalizeString(req.body?.role);
       const quote = normalizeString(req.body?.quote);
@@ -343,36 +298,18 @@ export function createApiApp({ serveStaticDist = false } = {}) {
         return res.status(400).json({ error: 'Author, role, and testimonial quote are required.' });
       }
 
-      let previousAvatar = null;
-      let updatedItem = null;
-
-      const next = await updateContent((content) => {
-        const idx = content.testimonials.findIndex((t) => t.id === id);
-        if (idx === -1) return content;
-
-        previousAvatar = content.testimonials[idx].avatar;
-        updatedItem = {
-          ...content.testimonials[idx],
-          author,
-          role,
-          quote,
-          rating,
-          avatar,
-          updatedAt: new Date().toISOString()
-        };
-        content.testimonials[idx] = updatedItem;
-        return content;
+      const result = await updateTestimonial(req.params.id, {
+        author,
+        role,
+        quote,
+        rating,
+        avatar
       });
-
-      if (!updatedItem) {
+      if (!result) {
         return res.status(404).json({ error: 'Testimonial not found.' });
       }
 
-      if (previousAvatar && previousAvatar !== avatar) {
-        await cleanupUnusedUpload(previousAvatar, next);
-      }
-
-      res.json({ item: updatedItem, testimonials: next.testimonials });
+      res.json(result);
     } catch (err) {
       next(err);
     }
@@ -380,23 +317,12 @@ export function createApiApp({ serveStaticDist = false } = {}) {
 
   app.delete('/api/testimonials/:id', requireAdmin, async (req, res, next) => {
     try {
-      const { id } = req.params;
-      let removedItem = null;
-
-      const next = await updateContent((content) => {
-        const idx = content.testimonials.findIndex((t) => t.id === id);
-        if (idx !== -1) {
-          [removedItem] = content.testimonials.splice(idx, 1);
-        }
-        return content;
-      });
-
-      if (!removedItem) {
+      const result = await deleteTestimonial(req.params.id);
+      if (!result) {
         return res.status(404).json({ error: 'Testimonial not found.' });
       }
 
-      await cleanupUnusedUpload(removedItem.avatar, next);
-      res.json({ testimonials: next.testimonials });
+      res.json(result);
     } catch (err) {
       next(err);
     }
@@ -411,7 +337,10 @@ export function createApiApp({ serveStaticDist = false } = {}) {
 
   app.use((err, _req, res, _next) => {
     console.error(err);
-    res.status(500).json({ error: 'Internal server error.' });
+    if (err instanceof StorageConfigError) {
+      return res.status(err.status).json({ error: err.message });
+    }
+    res.status(500).json({ error: err.message || 'Internal server error.' });
   });
 
   return app;
